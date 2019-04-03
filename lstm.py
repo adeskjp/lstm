@@ -11,16 +11,12 @@ from tensorflow import keras
 # Visual Studio Code でDebugする時はfullpathで指定する
 # 2007/04/02 -2019/01/18
 # 3067 of data every a day
-# csv_path = '/home/kawaguchi/HK/fx/USDJPY.csv'
-csv_path = '/home/kawaguchi/HK/fx/USD_JPY_Week1.csv'
+csv_path = '/home/machinelearning/USD_JPY_Week1.csv'
 
-# csv_path = '/home/kawaguchi/HK/fx/test.csv'
 df = pd.read_csv(csv_path)
 
 # extract close value
 data = df['RateBid'].astype(np.float32)
-# data = df['close'].astype(np.float32)
-# data = df['CS-K88'].astype(np.float32)
 
 # normalize
 data_norm = (data - data.mean()) / data.std()
