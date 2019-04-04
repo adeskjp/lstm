@@ -1,21 +1,19 @@
 # -*- coding: utf-8 -*-
+# !/usr/bin/env python
 
 import time
-import pandas as pd
-import matplotlib.pyplot as plt
-
 import numpy as np
+import pandas as pd
 import tensorflow as tf
 from tensorflow import keras
+import json
+import matplotlib.pyplot as plt
 
-# Visual Studio Code でDebugする時はfullpathで指定する
-# 2007/04/02 -2019/01/18
-# 3067 of data every a day
-csv_path = '/home/machinelearning/USD_JPY_Week1.csv'
+csv_path = 'USD_JPY_Week1.csv'
 
 df = pd.read_csv(csv_path)
 
-# extract close value
+# extract RateBid value
 data = df['RateBid'].astype(np.float32)
 
 # normalize
@@ -24,7 +22,6 @@ data_norm = (data - data.mean()) / data.std()
 
 """
 1. z-score normalization
-以下の式で変換
 x_new = (x - x_mean) / x_std
 外れ値にもロバスト
 standardized_sample_df = (datasample_df - sample_df.mean()) / sample_df.std()
@@ -33,9 +30,8 @@ print(standardized_sample_df)
 
 """
 2. min-max normalization
-以下の式で0から1になるように変換
+0から1になるように変換
 x_new = (x - x_min) / (x_max - x_min)
-minとmaxに強く影響をされてしまう
 normalized_sample_df = (sample_df - sample_df.min()) / (sample_df.max() - sample_df.min())
 print(normalized_sample_df)
 """
@@ -62,23 +58,14 @@ y_train = np.array(y_train)
 x_test = np.array(x_test)
 y_test = np.array(y_test)
 
-#model = keras.Sequential([
-#    keras.layers.CuDNNLSTM(30,recurrent_initializer='glorot_normal'),
-#    keras.layers.Dropout(0.2),
-#    keras.layers.Dense(1,activation='linear')
-#])
-
 model = keras.Sequential()
 model.add(keras.layers.CuDNNLSTM(30,recurrent_initializer='glorot_normal'))
 model.add(keras.layers.Dropout(0.2))
 model.add(keras.layers.Dense(1,activation='linear'))
-
 model.compile(loss='mean_squared_error',
               optimizer='Adam',
               metrics=['mse'])
 
-# epoch=3
-# batch_size=1000
 epoch=3
 batch_size=1000
 
@@ -96,7 +83,7 @@ model.summary()
 
 fig, ax1 = plt.subplots(1,1)
 ax1.plot(yen_history.epoch, yen_history.history['loss'])
-ax1.set_title('TrainingError')
+ax1.set_title('Training Error')
 
 if model.loss == 'mae':
     ax1.set_ylabel('Mean Absolute Error (MAE)',fontsize=12)
